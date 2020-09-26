@@ -10,16 +10,20 @@ var Backlog = function (host, apiKey) {
   this.apiKey = apiKey;
 };
 
-/**
- * Returns information about your space.
- */
-Backlog.prototype.getSpace = async function () {
+Backlog.prototype._request = async function (options) {
   return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/space?apiKey=${this.apiKey}`,
+    WebClient.request({
+      method: options.method,
+      url: `https://${this.host}${options.path}?apiKey=${this.apiKey}`,
+      query: options.query,
+      body: options.body,
       success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
+        if (res.statusCode === 200 || res.statusCode === 201) {
+          if ((res.headers["content-type"] || "").toLowerCase().indexOf("application/json") >= 0) {
+            resolve(res.data);
+          } else {
+            resolve(res);
+          }
         } else {
           reject(res);
         }
@@ -32,29 +36,24 @@ Backlog.prototype.getSpace = async function () {
 };
 
 /**
- * Returns recent updates in your space.
- * @param {*} activities 
+ * Returns information about your space.
  */
-Backlog.prototype.getRecentUpdates = async function (activities = {}) {
-  return new Promise((resolve, reject) => {
-    // Modify query string
-    activities.apiKey = this.apiKey;
+Backlog.prototype.getSpace = async function () {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/space"
+  });
+};
 
-    // Get data.
-    WebClient.get({
-      url: `https://${this.host}/api/v2/space/activities`,
-      data: activities,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+/**
+ * Returns recent updates in your space.
+ * @param {*} query 
+ */
+Backlog.prototype.getRecentUpdates = async function (query = {}) {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/space/activities",
+    query
   });
 };
 
@@ -62,20 +61,9 @@ Backlog.prototype.getRecentUpdates = async function (activities = {}) {
  * Returns list of users in your space.
  */
 Backlog.prototype.getUserList = async function () {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/users?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/users"
   });
 };
 
@@ -84,20 +72,9 @@ Backlog.prototype.getUserList = async function () {
  * @param {number} userId 
  */
 Backlog.prototype.getUser = async function (userId) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/users/${userId}?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/users/${userId}`
   });
 };
 
@@ -169,20 +146,9 @@ Backlog.prototype.updateUser = async function (userId, user) {
  * Returns own information about user.
  */
 Backlog.prototype.getOwnUser = async function () {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/users/myself?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/users/myself"
   });
 };
 
@@ -191,20 +157,9 @@ Backlog.prototype.getOwnUser = async function () {
  * @param {string} projectIdOrKey 
  */
 Backlog.prototype.getStatusListOfProject = async function (projectIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects/${projectIdOrKey}/statuses?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/statuses`
   });
 };
 
@@ -212,20 +167,9 @@ Backlog.prototype.getStatusListOfProject = async function (projectIdOrKey) {
  * Returns list of priorities.
  */
 Backlog.prototype.getPriorityList = async function () {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/priorities?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/priorities"
   });
 };
 
@@ -233,54 +177,116 @@ Backlog.prototype.getPriorityList = async function () {
  * Returns list of resolutions.
  */
 Backlog.prototype.getResolutionList = async function () {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/resolutions?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/resolutions"
   });
 };
 
 /**
  * Returns list of projects.
- * @param {boolean} archived For unspecified parameters, this form returns all projects. For ‘false’ parameters, it returns unarchived projects. For ‘true’ parameters, it returns archived projects.
- * @param {boolean} [all] Only applies to administrators. If ‘true,’ it returns all projects. If ‘false,’ it returns only projects they have joined (set to ‘false’ by default).
+ * @param {*} query 
  */
-Backlog.prototype.getProjectList = async function (archived, all) {
-  return new Promise((resolve, reject) => {
-    // Set query
-    var query = { apiKey: this.apiKey };
-    if (typeof (archived) === "boolean") {
-      query.archived = archived;
-    }
-    if (typeof (all) === "boolean") {
-      query.all = all;
-    }
+Backlog.prototype.getProjectList = async function (query = {}) {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/projects",
+    query
+  });
+};
 
-    // Get data.
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects`,
-      data: query,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+/**
+ * Adds new project.
+ * @param {*} project 
+ */
+Backlog.prototype.addProject = async function (project) {
+  return this._request({
+    method: "POST",
+    path: "/api/v2/projects",
+    body: project
+  });
+};
+
+/**
+ * Returns information about project.
+ * @param {string} projectIdOrKey 
+ */
+Backlog.prototype.getProject = async function (projectIdOrKey) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}`
+  });
+};
+
+/**
+ * Updates information about project.
+ * @param {string} projectIdOrKey 
+ * @param {*} project 
+ */
+Backlog.prototype.updateProject = function (projectIdOrKey, project) {
+  return this._request({
+    method: "PATCH",
+    path: `/api/v2/projects/${projectIdOrKey}`,
+    body: project
+  });
+};
+
+/**
+ * Deletes project.
+ * @param {string} projectIdOrKey 
+ */
+Backlog.prototype.deleteProject = function (projectIdOrKey) {
+  return this._request({
+    method: "DELETE",
+    path: `/api/v2/projects/${projectIdOrKey}`
+  });
+};
+
+/**
+ * Downloads project icon.
+ * @param {string} projectIdOrKey 
+ * @returns {stream}
+ */
+Backlog.prototype.getProjectIcon = function (projectIdOrKey) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/image`
+  });
+};
+
+/**
+ * Returns recent update in the project.
+ * @param {string} projectIdOrKey 
+ */
+Backlog.prototype.getProjectRecentUpdates = function (projectIdOrKey) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/activities`
+  });
+};
+
+/**
+ * Adds user to list of project members.
+ * @param {string} projectIdOrKey 
+ * @param {*} user 
+ */
+Backlog.prototype.addProjectUser = function (projectIdOrKey, user) {
+  return this._request({
+    method: "POST",
+    path: `/api/v2/projects/${projectIdOrKey}/users`,
+    body: user
+  });
+};
+
+/**
+ * Returns list of project members.
+ * @param {string} projectIdOrKey 
+ * @param {*} query 
+ */
+Backlog.prototype.getProjectUserList = function (projectIdOrKey, query) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/users`
   });
 };
 
@@ -289,23 +295,9 @@ Backlog.prototype.getProjectList = async function (archived, all) {
  * @param {string} projectIdOrKey 
  */
 Backlog.prototype.getIssueTypeList = async function (projectIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects/${projectIdOrKey}/issueTypes`,
-      data: {
-        apiKey: this.apiKey
-      },
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/issueTypes`
   });
 };
 
@@ -314,23 +306,9 @@ Backlog.prototype.getIssueTypeList = async function (projectIdOrKey) {
  * @param {string} projectIdOrKey 
  */
 Backlog.prototype.getCategoryList = async function (projectIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects/${projectIdOrKey}/categories`,
-      data: {
-        apiKey: this.apiKey
-      },
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/categories`
   });
 };
 
@@ -339,23 +317,9 @@ Backlog.prototype.getCategoryList = async function (projectIdOrKey) {
  * @param {string} projectIdOrKey 
  */
 Backlog.prototype.getVersionMilestoneList = async function (projectIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects/${projectIdOrKey}/versions`,
-      data: {
-        apiKey: this.apiKey
-      },
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/versions`
   });
 };
 
@@ -364,23 +328,9 @@ Backlog.prototype.getVersionMilestoneList = async function (projectIdOrKey) {
  * @param {string} projectIdOrKey 
  */
 Backlog.prototype.getCustomoFieldList = async function (projectIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.get({
-      url: `https://${this.host}/api/v2/projects/${projectIdOrKey}/customFields`,
-      data: {
-        apiKey: this.apiKey
-      },
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/projects/${projectIdOrKey}/customFields`
   });
 };
 
@@ -389,25 +339,10 @@ Backlog.prototype.getCustomoFieldList = async function (projectIdOrKey) {
  * @param {*} query 
  */
 Backlog.prototype.getIssueList = async function (query = {}) {
-  return new Promise((resolve, reject) => {
-    // Modify query string
-    query.apiKey = this.apiKey;
-
-    // Get data.
-    WebClient.get({
-      url: `https://${this.host}/api/v2/issues`,
-      data: query,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/issues",
+    query
   });
 };
 
@@ -416,25 +351,10 @@ Backlog.prototype.getIssueList = async function (query = {}) {
  * @param {*} query 
  */
 Backlog.prototype.countIssue = async function (query = {}) {
-  return new Promise((resolve, reject) => {
-    // Modify query string
-    query.apiKey = this.apiKey;
-
-    // Get data.
-    WebClient.get({
-      url: `https://${this.host}/api/v2/issues/count`,
-      data: query,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: "/api/v2/issues/count",
+    query
   });
 };
 
@@ -443,21 +363,10 @@ Backlog.prototype.countIssue = async function (query = {}) {
  * @param {*} issue 
  */
 Backlog.prototype.addIssue = async function (issue) {
-  return new Promise((resolve, reject) => {
-    WebClient.post({
-      url: `https://${this.host}/api/v2/issues?apiKey=${this.apiKey}`,
-      data: issue,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "POST",
+    path: "/api/v2/issues",
+    body: issue
   });
 };
 
@@ -466,21 +375,9 @@ Backlog.prototype.addIssue = async function (issue) {
  * @param {string} issueIdOrKey 
  */
 Backlog.prototype.getIssue = async function (issueIdOrKey) {
-  return new Promise((resolve, reject) => {
-    // Get data.
-    WebClient.get({
-      url: `https://${this.host}/api/v2/issues/${issueIdOrKey}?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "GET",
+    path: `/api/v2/issues/${issueIdOrKey}`
   });
 };
 
@@ -490,24 +387,10 @@ Backlog.prototype.getIssue = async function (issueIdOrKey) {
  * @param {*} issue 
  */
 Backlog.prototype.updateIssue = async function (issueIdOrKey, issue) {
-  return new Promise((resolve, reject) => {
-    WebClient.patch({
-      url: `https://${this.host}/api/v2/issues/${issueIdOrKey}?apiKey=${this.apiKey}`,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      data: issue,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "PATCH",
+    path: `/api/v2/issues/${issueIdOrKey}`,
+    body: issue
   });
 };
 
@@ -516,20 +399,9 @@ Backlog.prototype.updateIssue = async function (issueIdOrKey, issue) {
  * @param {string} issueIdOrKey 
  */
 Backlog.prototype.deleteIssue = async function (issueIdOrKey) {
-  return new Promise((resolve, reject) => {
-    WebClient.delete({
-      url: `https://${this.host}/api/v2/issues/${issueIdOrKey}?apiKey=${this.apiKey}`,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "DELETE",
+    path: `/api/v2/issues/${issueIdOrKey}`
   });
 };
 
@@ -563,7 +435,7 @@ Backlog.ISSUE_PARENT_CHILD = {
  * Enum for issue sort key.
  * @enum {string}
  */
-Backlog.ISSUE_SORT = {
+Backlog.ISSUE_SORT_KEY = {
   ISSUETYPE: "issueType",
   CATEGORY: "category",
   VERSION: "version",
@@ -586,10 +458,10 @@ Backlog.ISSUE_SORT = {
 };
 
 /**
- * Enum for issue sort order.
+ * Enum for sort order.
  * @enum {string}
  */
-Backlog.ISSUE_ORDER = {
+Backlog.SORT_ORDER = {
   ASC: "asc",
   DESC: "desc"
 };

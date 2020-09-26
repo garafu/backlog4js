@@ -8,6 +8,6 @@
   "author": "Akinari Tsugo",
   "license": "MIT",
   "dependencies": {
-    "at-framework": "^0.1.1"
+    "at-framework": "^0.3.1"
   }
 }

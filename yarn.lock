@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-at-framework@^0.1.0:
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/at-framework/-/at-framework-0.1.1.tgz#582986d7cf2481d060040517078d22e2f65d776e"
-  integrity sha512-N5I+AsGZB6FJowVrpsBDjySWa3VEosbTytUYK2EV9z+r5myp6KnaAZsOdy+Fcl6sOVmKEEpQ5ytCjJvz6fP5Ig==
+at-framework@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/at-framework/-/at-framework-0.3.1.tgz#7947802e714cd76fb609b1a81f5195c30a114278"
+  integrity sha512-8Ds50VPGluvSq9zY0Fb6VTZEZPhIb+3bhjz4wx6/CRgd7/KBYPhVB91QkJJrsTTTXapqEgWQCHFK7YgSy+0I1w==
   dependencies:
     iconv-lite "^0.4.19"
 

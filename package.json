@@ -1,0 +1,13 @@
+{
+  "name": "backlog4js",
+  "version": "0.0.1",
+  "description": "Backlog web api wrapper.",
+  "main": "src/index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "Akinari Tsugo",
+  "license": "MIT",
+  "dependencies": {
+    "at-framework": "^0.1.1"
+  }
+}

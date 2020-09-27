@@ -58,6 +58,49 @@ Backlog.prototype.getRecentUpdates = async function (query = {}) {
 };
 
 /**
+ * Returns logo PNG image of your space.
+ * @returns {stream}
+ */
+Backlog.prototype.getSpaceLogo = async function () {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/space/image"
+  });
+};
+
+/**
+ * Returns space notification.
+ */
+Backlog.prototype.getSpaceNotification = async function () {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/space/notification"
+  });
+};
+
+/**
+ * Updates space notification.
+ * @param {string} notification 
+ */
+Backlog.prototype.updateSpaceNotification = async function (notification) {
+  return this._request({
+    method: "PUT",
+    path: "/api/v2/space/notification",
+    body: { content: notification }
+  });
+};
+
+/**
+ * Returns information about space disk usage.
+ */
+Backlog.prototype.getSpaceDiskUsage = async function () {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/space/diskUsage"
+  });
+};
+
+/**
  * Returns list of users in your space.
  */
 Backlog.prototype.getUserList = async function () {
@@ -94,24 +137,13 @@ Backlog.prototype.getUser = async function (userId) {
  * @param {backlog.addUser.user} user 
  */
 Backlog.prototype.addUser = async function (user) {
-  return new Promise((resolve, reject) => {
-    WebClient.post({
-      url: `https://${this.host}/api/v2/users?apiKey=${this.apiKey}`,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      data: user,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "POST",
+    path: "/api/v2/users",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: user
   });
 };
 
@@ -121,24 +153,13 @@ Backlog.prototype.addUser = async function (user) {
  * @param {*} user 
  */
 Backlog.prototype.updateUser = async function (userId, user) {
-  return new Promise((resolve, reject) => {
-    WebClient.patch({
-      url: `https://${this.host}/api/v2/users/${userId}?apiKey=${this.apiKey}`,
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      data: user,
-      success: (req, res) => {
-        if (res.statusCode === 200) {
-          resolve(JSON.parse(res.data));
-        } else {
-          reject(res);
-        }
-      },
-      error: (err) => {
-        reject(err);
-      }
-    });
+  return this._request({
+    method: "PATCH",
+    path: `/api/v2/users/${userId}`,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: user
   });
 };
 
@@ -149,6 +170,93 @@ Backlog.prototype.getOwnUser = async function () {
   return this._request({
     method: "GET",
     path: "/api/v2/users/myself"
+  });
+};
+
+/**
+ * Downloads user icon.
+ * @param {number} userId 
+ * @returns {stream}  See "content-disposition" or "content-type" header.
+ */
+Backlog.prototype.getUserIcon = async function (userId) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/users/${userId}/icon`
+  });
+};
+
+/**
+ * Returns user’s recent updates.
+ * @param {number} userId 
+ * @param {*} [query] 
+ */
+Backlog.prototype.getUserRecentUpdates = async function (userId, query) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/users/${userId}/activities`,
+    query
+  });
+};
+
+/**
+ * Returns the list of stars that user received.
+ * @param {number} userId 
+ * @param {*} [query] 
+ */
+Backlog.prototype.getReceivedStarList = async function (userId, query) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/users/${userId}/stars`,
+    query
+  });
+};
+
+/**
+ * Returns number of stars that user received.
+ * @param {number} userId 
+ * @param {*} [query] 
+ */
+Backlog.prototype.countUserReceivedStars = async function (userId, query) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/users/${userId}/stars/count`,
+    query
+  });
+};
+
+/**
+ * Returns list of issues which the user viewed recently.
+ * @param {*} [query] 
+ */
+Backlog.prototype.getListOfRecentlyViewedIssues = function (query) {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/users/myself/recentlyViewedIssues",
+    query
+  });
+};
+
+/**
+ * Returns list of projects which the user viewed recently.
+ * @param {*} [query] 
+ */
+Backlog.prototype.getListOfRecentlyViewedProjects = function (query) {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/users/myself/recentlyViewedProjects",
+    query
+  });
+};
+
+/**
+ * Returns list of Wikis which the user viewed recently.
+ * @param {*} [query] 
+ */
+Backlog.prototype.getListOfRecentlyViewedWikis = function (query) {
+  return this._request({
+    method: "GET",
+    path: "/api/v2/users/myself/recentlyViewedWikis",
+    query
   });
 };
 
@@ -286,7 +394,24 @@ Backlog.prototype.addProjectUser = function (projectIdOrKey, user) {
 Backlog.prototype.getProjectUserList = function (projectIdOrKey, query) {
   return this._request({
     method: "GET",
-    path: `/api/v2/projects/${projectIdOrKey}/users`
+    path: `/api/v2/projects/${projectIdOrKey}/users`,
+    query
+  });
+};
+
+/**
+ * Removes user from list project members.
+ * @param {string} projectIdOrKey 
+ * @param {number} userId 
+ */
+Backlog.prototype.deleteProjectUser = function (projectIdOrKey, userId) {
+  return this._request({
+    method: "DELETE",
+    path: `/api/v2/projects/${projectIdOrKey}/users`,
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: { userId }
   });
 };
 

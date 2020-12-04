@@ -531,6 +531,69 @@ Backlog.prototype.deleteIssue = async function (issueIdOrKey) {
 };
 
 /**
+ * Get comment list.
+ * @param {string} issueIdOrKey 
+ * @param {object} [query]
+ */
+Backlog.prototype.getCommentList = async function (issueIdOrKey, query = {}) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/issues/${issueIdOrKey}/comments`,
+    query
+  });
+};
+
+/**
+ * Add comment.
+ * @param {string} issueIdOrKey 
+ * @param {object} comment
+ */
+Backlog.prototype.addComment = async function (issueIdOrKey, comment) {
+  return this._request({
+    method: "POST",
+    path: `/api/v2/issues/${issueIdOrKey}/comments`,
+    body: comment
+  });
+};
+
+/**
+ * Get number of comments.
+ * @param {string} issueIdOrKey 
+ */
+Backlog.prototype.countComment = async function (issueIdOrKey) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/issues/${issueIdOrKey}/comments/count`
+  });
+};
+
+/**
+ * Get specified comment information.
+ * @param {string} issueIdOrKey
+ * @param {number} commentId
+ */
+Backlog.prototype.getComment = async function (issueIdOrKey, commentId) {
+  return this._request({
+    method: "GET",
+    path: `/api/v2/issues/${issueIdOrKey}/comments/${commentId}`
+  });
+};
+
+/**
+ * Update specified comment.
+ * @param {string} issueIdOrKey 
+ * @param {number} commentId
+ * @param {object} comment
+ */
+Backlog.prototype.deleteComment = async function (issueIdOrKey, commentId, comment) {
+  return this._request({
+    method: "PATCH",
+    path: `/api/v2/issues/${issueIdOrKey}/comments/${commentId}`,
+    body: comment
+  });
+};
+
+/**
  * Enum for user roleType.
  * @readonly
  * @enum {number}

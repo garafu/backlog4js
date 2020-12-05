@@ -580,12 +580,24 @@ Backlog.prototype.getComment = async function (issueIdOrKey, commentId) {
 };
 
 /**
+ * Delete specified comment.
+ * @param {string} issueIdOrKey 
+ * @param {number} commentId
+ */
+Backlog.prototype.deleteComment = async function (issueIdOrKey, commentId) {
+  return this._request({
+    method: "DELETE",
+    path: `/api/v2/issues/${issueIdOrKey}/comments/${commentId}`
+  });
+};
+
+/**
  * Update specified comment.
  * @param {string} issueIdOrKey 
  * @param {number} commentId
  * @param {object} comment
  */
-Backlog.prototype.deleteComment = async function (issueIdOrKey, commentId, comment) {
+Backlog.prototype.updateComment = async function (issueIdOrKey, commentId, comment) {
   return this._request({
     method: "PATCH",
     path: `/api/v2/issues/${issueIdOrKey}/comments/${commentId}`,

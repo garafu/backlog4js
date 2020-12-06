@@ -9,6 +9,10 @@
   "keywords": [],
   "author": "Akinari Tsugo",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garafu/backlog4js.git"
+  },
   "dependencies": {
     "at-framework": "^0.3.1",
     "jsdoc-to-markdown": "^6.0.1"

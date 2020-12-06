@@ -4,8 +4,6 @@ Backlog API version 2 client.
 
 ## Installation
 
-npm:
-
 ```
 npm install backlog4js
 ```
@@ -14,7 +12,7 @@ npm install backlog4js
 
 ```
 const HOST = "xxxx.backlog.com";
-const API_KEY = "===YOUR-API-KEY==="
+const API_KEY = "===YOUR-API-KEY===";
 const Backlog = require("backlog4js");
 
 var backlog = new Backlog(HOST, API_KEY);
@@ -32,7 +30,9 @@ var backlog = new Backlog(HOST, API_KEY);
 
 ## References
 
-* [API Documents](./docs/api.md)
+* [API Documents](https://github.com/garafu/backlog4js/blob/master/docs/api.md)
+
+(*) See also [official api references](https://developer.nulab.com/docs/backlog/)
 
 ## License
 

@@ -1,14 +1,17 @@
 {
   "name": "backlog4js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Backlog web api wrapper.",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "docs": "jsdoc2md ./src/index.js > ./docs/api.md"
+  },
   "keywords": [],
   "author": "Akinari Tsugo",
   "license": "MIT",
   "dependencies": {
-    "at-framework": "^0.3.1"
+    "at-framework": "^0.3.1",
+    "jsdoc-to-markdown": "^6.0.1"
   },
   "devDependencies": {
     "eslint": "^7.10.0",

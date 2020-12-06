@@ -1,9 +1,13 @@
 const { WebClient } = require("at-framework/net");
 
+
 /**
-* 
-* @param {string} host 
-* @param {string} apiKey 
+ * @class Backlog API v2 Client class.
+ */
+/**
+* Create and initialize backlog api v2 client instance.
+* @param {string} host    Backlog domain name.
+* @param {string} apiKey  Backlog access api key.
 */
 var Backlog = function (host, apiKey) {
   this.host = host;

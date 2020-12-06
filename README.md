@@ -30,6 +30,10 @@ var backlog = new Backlog(HOST, API_KEY);
 })();
 ```
 
+## References
+
+* [API Documents](./docs/api.md)
+
 ## License
 
 MIT License
